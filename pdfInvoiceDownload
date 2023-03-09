@@ -1,0 +1,687 @@
+// Automatic FlutterFlow imports
+import '/backend/backend.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/custom_code/actions/index.dart'; // Imports other custom actions
+import '/flutter_flow/custom_functions.dart'; // Imports custom functions
+import 'package:flutter/material.dart';
+// Begin custom action code
+// DO NOT REMOVE OR MODIFY THE CODE ABOVE!
+
+import 'index.dart'; // Imports other custom actions
+
+//marche sur android
+
+// code created by https://www.youtube.com/@flutterflowexpert
+// video - https://www.youtube.com/watch?v=9HngDsCIJPY
+// if you have problem implementing this code you can hire me as a mentor - https://calendly.com/bulgaria_mitko
+import 'dart:async';
+import 'dart:ui';
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as p;
+import 'package:printing/printing.dart';
+
+Future pdfInvoiceDownload(
+  BuildContext context,
+  String orderDate,
+  String orderNumber,
+  String marque,
+  String enseigne,
+  String raisonSociale,
+  String adresseLiv,
+  String cpLivvilleLiv,
+  String paysLiv,
+  String telResponsable,
+  String siren,
+  String agentClient,
+  String telephoneAgent,
+  String quantiteCommande,
+  String totalCommande,
+  List<String> references,
+  List<String> fondo,
+  List<String> modele,
+  List<String> tomai,
+  List<int> quantites,
+  List<double> prixUnitaires,
+  List<double> pDv,
+  List<String> dateLiv,
+  List<ProductsInOrderRecord> docs,
+  String logoMarque,
+  int numItems,
+  double? largeur,
+) async {
+  List<p.Widget> widgets = [];
+  /*final NetworkImage imageData = NetworkImage(
+      'https://firebasestorage.googleapis.com/v0/b/angoshoes-24dbb.appspot.com/o/logo%20transp.png?alt=media&token=c0ec1fa5-ac4c-43df-a574-9e6da6a55158');
+  final Completer<Uint8List> completer = Completer<Uint8List>();
+  imageData.resolve(ImageConfiguration()).addListener(
+    ImageStreamListener((ImageInfo info, bool _) async {
+      final ByteData? imageDataByteData =
+          await info.image.toByteData(format: ImageByteFormat.png);
+      final Uint8List imageDataUint8List =
+          imageDataByteData!.buffer.asUint8List();
+      completer.complete(imageDataUint8List);
+    }),
+  );
+  final Uint8List imageDataUint8List = await completer.future;*/
+  final images = p.Row(
+    children: [
+      p.Image(
+        await imageFromAssetBundle('assets/images/logo_transp.png'),
+        fit: p.BoxFit.cover,
+        alignment: p.Alignment.topLeft,
+        width: 75,
+        height: 75,
+      ),
+      p.Image(
+        await imageFromAssetBundle(logoMarque),
+        fit: p.BoxFit.cover,
+        alignment: p.Alignment.topLeft,
+        width: largeur, //largeur
+        height: 75,
+      ),
+    ],
+  );
+  final firstLigne = p.Row(
+    mainAxisSize: p.MainAxisSize.max,
+    children: [
+      p.Expanded(
+        flex: 3,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          crossAxisAlignment: p.CrossAxisAlignment.start,
+          children: [
+            p.Text(
+              'Référence',
+            ),
+            p.Text('Date de liv.',
+                style: const p.TextStyle(
+                  fontSize: 8,
+                )),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 4,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          crossAxisAlignment: p.CrossAxisAlignment.start,
+          children: [
+            p.Text(
+              'Désignation',
+            ),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 4,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          children: [
+            p.Text(
+              'Détail',
+            ),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 2,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          children: [
+            p.Text(
+              'Quantité',
+            ),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 2,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          children: [
+            p.Text(
+              'PU H.T.',
+            ),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 2,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          children: [
+            p.Text(
+              'Total H.T.',
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+  final infoAngo = p.Row(
+    mainAxisSize: p.MainAxisSize.max,
+    mainAxisAlignment: p.MainAxisAlignment.spaceBetween,
+    children: [
+      p.Column(
+        mainAxisSize: p.MainAxisSize.max,
+        crossAxisAlignment: p.CrossAxisAlignment.start,
+        children: [
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'ANGO SARL',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                '25 BD LEDRU ROLLIN',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'URBAN PARK LOT 13',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                '13015 MARSEILLE',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'Tél : 04 95 06 97 65',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Container(
+                width: 1,
+                height: 10,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'E-mail : angoshoes@gmail.com',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'Siret : 452 200 678 00053',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'APE : 51.4S',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'RCS : MARSEILLE 452200678',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'N°Tva : FR 10452200678',
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Container(
+                width: 1,
+                height: 10,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'Date de prise d\'ordre : ',
+              ),
+              p.Text(
+                orderDate,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                'Numéro de prise d\'ordre : ',
+              ),
+              p.Text(
+                orderNumber,
+              ),
+            ],
+          ),
+        ],
+      ),
+      p.Column(
+        mainAxisSize: p.MainAxisSize.max,
+        crossAxisAlignment: p.CrossAxisAlignment.end,
+        children: [
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                enseigne,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                raisonSociale,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                adresseLiv,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                cpLivvilleLiv,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                paysLiv,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                'Tel : ',
+              ),
+              p.Text(
+                telResponsable,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                'SIREN : ',
+              ),
+              p.Text(
+                siren,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            mainAxisAlignment: p.MainAxisAlignment.end,
+            children: [
+              p.Container(
+                width: 1,
+                height: 10,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                'Agent : ',
+              ),
+              p.Text(
+                agentClient,
+              ),
+            ],
+          ),
+          p.Row(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                'Téléphone : ',
+              ),
+              p.Text(
+                telephoneAgent,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+  final ligneTotal = p.Row(
+    mainAxisSize: p.MainAxisSize.max,
+    children: [
+      p.Expanded(
+        flex: 1,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          mainAxisAlignment: p.MainAxisAlignment.center,
+          children: [
+            p.Row(
+              children: [
+                p.Text(
+                  quantiteCommande.toString(),
+                ),
+                p.Text(
+                  ' paires',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      p.Expanded(
+        flex: 1,
+        child: p.Column(
+          mainAxisSize: p.MainAxisSize.max,
+          mainAxisAlignment: p.MainAxisAlignment.center,
+          children: [
+            p.Row(
+              children: [
+                p.Text(
+                  totalCommande.toString(),
+                ),
+                p.Text(
+                  ' euros HT',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+  /*final angoLogo = p.Container(
+    child: p.Image(
+      p.MemoryImage(imageDataUint8List),
+      fit: p.BoxFit.contain,
+      width: 200,
+      height: 200,
+    ),
+  );*/
+  widgets.add(images);
+  //widgets.add(angoLogo);
+  widgets.add(infoAngo);
+  widgets.add(p.SizedBox(height: 8));
+  widgets.add(firstLigne);
+  for (int i = 0; i < numItems; i++) {
+    widgets.add(p.Row(
+      mainAxisSize: p.MainAxisSize.max,
+      children: [
+        p.Expanded(
+          flex: 3,
+          child: p.Column(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Text(
+                references[i].toString(),
+              ),
+              p.Text(dateLiv[i].toString(),
+                  style: const p.TextStyle(
+                    fontSize: 8,
+                  )),
+              p.Container(
+                width: 1,
+                height: 3,
+                decoration: p.BoxDecoration(),
+              ),
+            ],
+          ),
+        ),
+        p.Expanded(
+          flex: 4,
+          child: p.Column(
+            mainAxisSize: p.MainAxisSize.max,
+            crossAxisAlignment: p.CrossAxisAlignment.start,
+            children: [
+              p.Row(
+                children: [
+                  p.Text(modele[i].toString() + " "),
+                  p.Text(
+                    fondo[i].toString(),
+                    style: const p.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
+                ],
+              ),
+              p.Text(tomai[i].toString()),
+              p.Container(
+                width: 1,
+                height: 3,
+                decoration: p.BoxDecoration(),
+              ),
+            ],
+          ),
+        ),
+        p.Expanded(
+          flex: 4,
+          child: p.Column(mainAxisSize: p.MainAxisSize.max, children: [
+            p.Row(
+                mainAxisSize: p.MainAxisSize.max,
+                mainAxisAlignment: p.MainAxisAlignment.spaceBetween,
+                /*crossAxisAlignment:
+                                        p.CrossAxisAlignment.stretch,*/
+                children: [
+                  p.Column(
+                    children: [
+                      p.Text("35"),
+                      p.Text(
+                        (docs[i].soloPack.solo35! +
+                                docs[i].soloPack.packA! * 0 +
+                                docs[i].soloPack.packB! * 0 +
+                                docs[i].soloPack.packC! * 0 +
+                                docs[i].soloPack.packD! * 1 +
+                                docs[i].soloPack.packE! * 0)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("36"),
+                      p.Text(
+                        (docs[i].soloPack.solo36! +
+                                docs[i].soloPack.packA! * 1 +
+                                docs[i].soloPack.packB! * 1 +
+                                docs[i].soloPack.packC! * 1 +
+                                docs[i].soloPack.packD! * 2 +
+                                docs[i].soloPack.packE! * 1)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("37"),
+                      p.Text(
+                        (docs[i].soloPack.solo37! +
+                                docs[i].soloPack.packA! * 2 +
+                                docs[i].soloPack.packB! * 1 +
+                                docs[i].soloPack.packC! * 2 +
+                                docs[i].soloPack.packD! * 3 +
+                                docs[i].soloPack.packE! * 2)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("38"),
+                      p.Text(
+                        (docs[i].soloPack.solo38! +
+                                docs[i].soloPack.packA! * 2 +
+                                docs[i].soloPack.packB! * 2 +
+                                docs[i].soloPack.packC! * 3 +
+                                docs[i].soloPack.packD! * 3 +
+                                docs[i].soloPack.packE! * 3)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("39"),
+                      p.Text(
+                        (docs[i].soloPack.solo39! +
+                                docs[i].soloPack.packA! * 2 +
+                                docs[i].soloPack.packB! * 2 +
+                                docs[i].soloPack.packC! * 2 +
+                                docs[i].soloPack.packD! * 2 +
+                                docs[i].soloPack.packE! * 3)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("40"),
+                      p.Text(
+                        (docs[i].soloPack.solo40! +
+                                docs[i].soloPack.packA! * 1 +
+                                docs[i].soloPack.packB! * 1 +
+                                docs[i].soloPack.packC! * 1 +
+                                docs[i].soloPack.packD! * 1 +
+                                docs[i].soloPack.packE! * 2)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                  p.Column(
+                    children: [
+                      p.Text("41"),
+                      p.Text(
+                        (docs[i].soloPack.solo41! +
+                                docs[i].soloPack.packA! * 0 +
+                                docs[i].soloPack.packB! * 1 +
+                                docs[i].soloPack.packC! * 1 +
+                                docs[i].soloPack.packD! * 0 +
+                                docs[i].soloPack.packE! * 1)
+                            .toString(),
+                      ),
+                    ],
+                  ),
+                ]),
+          ]),
+        ),
+        p.Expanded(
+          flex: 2,
+          child: p.Column(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                quantites[i].toString(),
+              ),
+            ],
+          ),
+        ),
+        p.Expanded(
+          flex: 2,
+          child: p.Column(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                prixUnitaires[i].toString(),
+              ),
+              p.Text(
+                " ",
+              ),
+              p.Container(
+                width: 1,
+                height: 3,
+                decoration: p.BoxDecoration(),
+              ),
+            ],
+          ),
+        ),
+        p.Expanded(
+          flex: 2,
+          child: p.Column(
+            mainAxisSize: p.MainAxisSize.max,
+            children: [
+              p.Text(
+                pDv[i].toString(),
+              ),
+              p.Text(
+                " ",
+              ),
+              p.Container(
+                width: 1,
+                height: 3,
+                decoration: p.BoxDecoration(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ));
+    widgets.add(p.SizedBox(height: 4));
+  }
+  ;
+  widgets.add(p.Divider(thickness: 2));
+  widgets.add(ligneTotal);
+  final pdf = p.Document();
+  pdf.addPage(
+    p.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      build: (context) => widgets,
+    ),
+  );
+  await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save());
+}
